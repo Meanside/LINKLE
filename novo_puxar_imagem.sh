@@ -10,7 +10,7 @@ echo "== RESTAURAÇÃO DE IMAGEM PARA DISCO =="
 
 # Solicita o pendrive com a imagem
 echo "Pendrives disponíveis:"
-lsblk -d -o NAME,SIZE,TYPE | grep "disk"
+lsblk -d -o NAME,SIZE,TYPE,MODEL | grep "disk"
 read -p "Informe o nome do pendrive onde está a imagem (exemplo: sdb): " pendrive
 
 # Verifica se o pendrive existe
@@ -29,7 +29,7 @@ fi
 
 # Lista as imagens disponíveis
 echo "Imagens disponíveis no pendrive:"
-ls $mountpoint/*.img
+ls $mountpoint/*.img.gz $mountpoint/*.img 2>/dev/null
 read -p "Informe o nome completo da imagem para restaurar: " imagem
 
 # Verifica se a imagem existe
@@ -41,7 +41,7 @@ fi
 
 # Solicita o disco de destino
 echo "Discos disponíveis:"
-lsblk -d -o NAME,SIZE,TYPE | grep "disk"
+lsblk -d -o NAME,SIZE,TYPE,MODEL | grep "disk"
 read -p "Informe o nome do disco de destino (exemplo: sda): " destino
 
 # Verifica se o disco existe
@@ -60,9 +60,14 @@ if [[ $confirm != "s" ]]; then
     exit 1
 fi
 
-# Restaura a imagem usando dd
-echo "Restaurando a imagem para o disco..."
-dd if=$mountpoint/$imagem of=/dev/$destino bs=4M status=progress
+# Verifica se a imagem está comprimida
+if [[ $imagem == *.gz ]]; then
+    echo "A imagem está comprimida. Descomprimindo e restaurando ao mesmo tempo..."
+    gunzip -c $mountpoint/$imagem | dd of=/dev/$destino bs=4M status=progress
+else
+    echo "Restaurando a imagem para o disco..."
+    dd if=$mountpoint/$imagem of=/dev/$destino bs=4M status=progress
+fi
 
 # Verifica se houve sucesso
 if [[ $? -eq 0 ]]; then
