@@ -8,9 +8,9 @@ fi
 
 echo "== CRIAÇÃO DE IMAGEM DO DISCO =="
 
-# Lista os discos disponíveis
+# Lista os discos disponíveis com o nome do modelo
 echo "Discos disponíveis:"
-lsblk -d -o NAME,SIZE,TYPE | grep "disk"
+lsblk -d -o NAME,SIZE,TYPE,MODEL | grep "disk"
 
 # Solicita o disco de origem
 read -p "Informe o nome do disco de origem (exemplo: sda): " origem
@@ -23,7 +23,7 @@ fi
 
 # Solicita o pendrive de destino
 echo "Pendrives disponíveis:"
-lsblk -d -o NAME,SIZE,TYPE | grep "disk"
+lsblk -d -o NAME,SIZE,TYPE,MODEL | grep "disk"
 read -p "Informe o nome do pendrive onde será salva a imagem (exemplo: sdb): " pendrive
 
 # Verifica se o pendrive existe
